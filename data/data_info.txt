@@ -1,0 +1,2 @@
+1. kor_admin_division.xlsx - 한국 행정구역 코드
+2. kor_city - 법정동 행정동 변환
