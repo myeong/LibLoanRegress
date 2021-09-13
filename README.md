@@ -44,9 +44,24 @@
 	버스노선, 정류장, 지하철 역, 노선 데이터 수집 후 Qgis를 통해 시군구 매칭 후 데이터 매칭을 위해 행정동 법정동 코드사용 
 	시군구 면적, 연앙인구, 도서관 데이터 수집
 
-### 회귀를 위한 데이터 셋
-전체 데이터: result_data.csv
+### 최상위 폴더 설명
+1. data 폴더 = 회귀분석을 위한 데이터 세트
+2. ipynb 폴더 = python jupyter ipynb 파일 (순서별로 숫자로 라벨링)
+3. html 폴더 = folium library를 통해 만든 지표 지도 결과 html 파일
 
+### 회귀 데이터 세트 위한 data 폴더 설명
+1.  /data/result/ , 데이터 전체 과정 결과 데이터 세트
+2. /data/temporary_storage/ , 데이터 생성 과정에서 나온 데이터 세트
+3. /data/geojson/ , folium library 시각화를 위한 geojson
+4. /data/korea_city/ , 한국 행정동 법정동 코드 데이터
+5. /data/public_library_statics/ , 문체부 국가도서관 통계시스템 2015-2018 데이터
+6. /data/SHP/ , 버스정류장, 지하철 등 위치 데이터와 읍면동 데이터를 매칭하기 위한 SHP 파일
+7. /data/statics/ , 통계청 데이터 세트
+8. /data/traffic/ , 버스정류장, 지하철, 도로노드링크 데이터 세트
+
+### 최종 데이터 세트
+1. /data/result/result.csv , 시군구별 2015-2018 데이터
+2. /data/result/3_library_info.csv , 2015-2018 각 도서관의 정보 데이터
 
 ### 시각화
 1. folium을 통한 사회적 지표, 대출 비율 시각화
