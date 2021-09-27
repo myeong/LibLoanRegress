@@ -31,32 +31,42 @@ vars$above_bachelor <- vars$학사_비율 * 100
 pca <- prcomp(vars[,c("above_bachelor", "소득액", "EQ5D")], center = TRUE,scale. = TRUE)
 summary(pca)
 vars$wellbeing_index <- -pca$x[,1] # 55% variance
+vars$deprevation_index <- pca$x[,1]
 
+cor(vars[,c("deprevation_index","인구수","AGE","books_per_library","libraries_per_area","대중교통_역_노선_면적")])
+cor(vars[vars$년도=="2015",c("deprevation_index", "above_bachelor", "소득액", "EQ5D")])
+cor(vars[vars$년도=="2016",c("deprevation_index", "above_bachelor", "소득액", "EQ5D")])
+cor(vars[vars$년도=="2017",c("deprevation_index", "above_bachelor", "소득액", "EQ5D")])
+cor(vars[vars$년도=="2018",c("deprevation_index", "above_bachelor", "소득액", "EQ5D")])
 
-cor(vars[,c("wellbeing_index","인구수","AGE","books_per_library","libraries_per_area","대중교통_역_노선_면적")])
-cor(vars[vars$년도=="2015",c("wellbeing_index", "above_bachelor", "소득액", "EQ5D")])
-cor(vars[vars$년도=="2016",c("wellbeing_index", "above_bachelor", "소득액", "EQ5D")])
-cor(vars[vars$년도=="2017",c("wellbeing_index", "above_bachelor", "소득액", "EQ5D")])
-cor(vars[vars$년도=="2018",c("wellbeing_index", "above_bachelor", "소득액", "EQ5D")])
+vars$시도 <- as.factor(vars$시도)
+vars$province <- vars$시도
 
-fit <- lmer("books_per_person ~ wellbeing_index + 인구수 + AGE + books_per_library + libraries_per_area +
+fit <- lmer("books_per_person ~ deprevation_index + 인구수 + AGE + books_per_library + libraries_per_area +
           대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars)
 r.squaredGLMM(fit)
-summary(lmer("books_per_person ~ above_bachelor + 인구수 + AGE + books_per_library + libraries_per_area +
-          대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars))
-summary(lmer("books_per_person ~ 소득액 + 인구수 + AGE + books_per_library + libraries_per_area +
-          대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars))
-summary(lmer("books_per_person ~ EQ5D + 인구수 + AGE + books_per_library + libraries_per_area +
-          대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars))
-
-
-fit <- lmer("books_per_person ~ wellbeing_index + 인구수 + AGE + books_per_library + libraries_per_area +
-          년도 + (1|시도)", data=vars)
-r.squaredGLMM(fit)
 summary(fit)
-summary(lmer("books_per_person ~ above_bachelor + 인구수 + AGE + books_per_library + libraries_per_area +
-          년도 + (1|시도)", data=vars))
-summary(lmer("books_per_person ~ 소득액 + 인구수 + AGE + books_per_library + libraries_per_area +
-          년도 + (1|시도)", data=vars))
-summary(lmer("books_per_person ~ EQ5D + 인구수 + AGE + books_per_library + libraries_per_area +
-          년도 + (1|시도)", data=vars))
+summary(lmer("books_per_person ~ deprevation_index + 인구수 + AGE +  libraries_per_area +
+          대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars[vars$books_per_library >= median(vars$books_per_library),]))
+summary(lmer("books_per_person ~ deprevation_index + 인구수 + AGE +  libraries_per_area +
+          대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars[vars$books_per_library < median(vars$books_per_library),]))
+summary(lmer("books_per_person ~ deprevation_index + 인구수 + AGE +  books_per_library +
+          대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars[vars$libraries_per_area >= median(vars$libraries_per_area),]))
+summary(lmer("books_per_person ~ deprevation_index + 인구수 + AGE +  books_per_library +
+          대중교통_역_노선_면적 + 년도 + (1|시도)", data=vars[vars$libraries_per_area < median(vars$libraries_per_area),]))
+
+
+library(effects)
+effects_deprv <- effects::effect(term= "deprevation_index", mod= fit)
+summary(effects_deprv)
+
+x_dprv <- as.data.frame(effects_deprv)
+p <- ggplot() + 
+      geom_point(data=vars, aes(deprevation_index, books_per_person, col=province)) + 
+      geom_point(data=x_dprv, aes(x=deprevation_index, y=fit), color="blue") +
+      geom_line(data=x_dprv, aes(x=deprevation_index, y=fit), color="blue") +
+      geom_ribbon(data= x_dprv, aes(x=deprevation_index, ymin=lower, ymax=upper), alpha= 0.3, fill="blue") +
+      labs(x="Deprivation Index (centered & scaled)", y="Books per Person") + theme_bw()
+
+
+p
